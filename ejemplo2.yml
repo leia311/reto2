@@ -4,6 +4,13 @@
   gather_facts: yes
   become: yes
   
+  tasks:
+    - name: Instalar los paquetes de PostgreSQL
+      yum:
+        name:
+          - postgresql
+          - postgresql-server
+        state: latest
   
   
 
