@@ -1,0 +1,10 @@
+---
+- name: Reto 2
+  hosts: all
+  gather_facts: yes
+  become: yes
+  
+  
+  
+
+  
