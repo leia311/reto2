@@ -11,7 +11,75 @@
           - postgresql
           - postgresql-server
         state: latest
+        
+    - name: Inicializar el clúster de PostgreSQL
+      command: postgresql-setup initdb
+      
+    - name: Habilitar y iniciar el servicio de PostgreSQL
+      systemd:
+        name: postgresql
+        state: started
+        enabled: yes
   
-  
+    - name: Crear base de datos
+      postgresql_db:
+        name: tatiana_base
+        login_user: tatiana_admin
+        login_password: tatiana
+        
+    - name: Crear usuario de base de datos
+      postgresql_user:
+        db: tatiana_base
+        name: tatiana_usuario
+        password: tatiana_password
+        login_user: tatiana_admin
+        login_password: tatiana
+     
+    - name: Otorgar privilegios al usuario en la base de datos
+      postgresql_privs:
+        db: tatiana_base
+        role: tatiana_usuario
+        privs: "ALL"
+        grant_option: no
+        login_user: tatiana_admin
+        login_password: tatiana
+        
+        
+    - name: Establecer conexión MD5 para el usuario de base de datos
+      postgresql_user:
+        name: tatiana_usuario
+        password: tatiana_password
+        encrypted: md5   #md59543f1d82624df2b31672ec0f7050460
+        login_user: tatiana_admin
+        login_password: tatiana
+        
+    - name: Crear directorio de respaldo
+      file:
+        path: /tmp/backup_tatiana_base
+        state: directory
+        mode: '0755'
+
+    - name: Realizar respaldo de la base de datos
+      postgresql_backup:
+        db: tatiana_base
+        dest: /tmp/backup_tatiana_base
+        format: custom
+        login_user: tatiana_admin
+        login_password: tatiana
+        
+    - name: Reiniciar el servidor
+      reboot:
+        reboot_timeout: 120
+        
+    - name: Cambiar el hostname
+      hostname:
+        name: tatiana
+        
+    - name: Obtener información del servidor
+      setup:
+
+    - name: Imprimir IP y hostname
+      debug:
+        msg: "La IP del servidor es {{ ansible_default_ipv4.address }} y el hostname es {{ ansible_hostname }}"
 
   
