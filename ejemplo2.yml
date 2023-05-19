@@ -13,7 +13,7 @@
         state: latest
         
     - name: Inicializar el clúster de PostgreSQL
-      command: postgresql-setup initdb
+      command: postgresql-setup --init  #initdb
       
     - name: Habilitar y iniciar el servicio de PostgreSQL
       systemd:
@@ -44,6 +44,14 @@
         login_user: tatiana_admin
         login_password: tatiana
         
+    - name: Otorgar privilegios al usuario en la base de datos OTRA FORMA 
+      postgresql_user:
+        db: tatiana_base
+        name: tatiana_usuario
+        password: tatiana_password
+        priv: "ALL"
+        expires: infinity
+        
         
     - name: Establecer conexión MD5 para el usuario de base de datos
       postgresql_user:
@@ -53,11 +61,23 @@
         login_user: tatiana_admin
         login_password: tatiana
         
+    - name: Create rails user, set MD5-hashed password, grant privs OTRA FORMA 
+      postgresql_user:
+      name: tatiana_usuario
+      password: md59543f1d82624df2b31672ec0f7050460
+      role_attr_flags: CREATEDB,NOSUPERUSER
+        
     - name: Crear directorio de respaldo
       file:
         path: /tmp/backup_tatiana_base
         state: directory
         mode: '0755'
+        
+    - name: Otro back up Dump an existing database to a file
+      community.postgresql.postgresql_db:
+        name: tatiana_base
+        state: dump
+        target: /tmp/backup_tatiana_base
 
     - name: Realizar respaldo de la base de datos
       postgresql_backup:
