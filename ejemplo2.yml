@@ -81,5 +81,9 @@
     - name: Imprimir IP y hostname
       debug:
         msg: "La IP del servidor es {{ ansible_default_ipv4.address }} y el hostname es {{ ansible_hostname }}"
-
+        
+    - name: Agregar línea al archivo /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "IP {{ ansible_default_ipv4.address }} HOSTNAME: {{ ansible_hostname }}"
   
